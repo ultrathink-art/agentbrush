@@ -1,5 +1,5 @@
 ## README Visual Examples
 
-- **BG removal demos: subject MUST contrast strongly with background** — bright/colorful subject on black bg, or dark subject on white bg. Dark-on-dark (e.g. dark robot on black bg) causes flood fill to leak into the subject, destroying the illustration. Two commits made this mistake before the fix.
+- **BG removal demos: ALWAYS use WHITE background** — white has zero color overlap with any colorful illustration. Black bg is risky: dark feather/fur/shadow details near edges are close to black threshold, flood fill nibbles them. Three iterations proved this. Current showcase: colorful owl on white bg.
 - Comparison images built with `/tmp/rebuild_readme_examples.py` pattern: Pillow checker-bg composites, side-by-side panels, labeled with `find_font()` Menlo fallback.
 - Composite example (#4) reuses the bg-removal cutout — if #1 looks bad, #4 cascades.
