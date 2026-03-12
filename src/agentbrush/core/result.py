@@ -50,7 +50,7 @@ class Result:
     @staticmethod
     def from_image(img, output_path: Path) -> Result:
         """Build a Result with stats computed from a Pillow RGBA image."""
-        data = list(img.getdata())
+        data = list(img.get_flattened_data())
         total = len(data)
         transparent = sum(1 for p in data if p[3] == 0) if total else 0
         opaque = total - transparent

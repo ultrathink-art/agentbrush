@@ -48,7 +48,7 @@ def remove_background(
     img = Image.open(input_path).convert("RGBA")
 
     # Check if already transparent (no-op)
-    data = list(img.getdata())
+    data = list(img.get_flattened_data())
     initial_transparent = sum(1 for p in data if p[3] == 0)
     if initial_transparent == len(data):
         result = Result.from_image(img, output_path)

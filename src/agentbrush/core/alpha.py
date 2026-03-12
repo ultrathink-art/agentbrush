@@ -48,8 +48,8 @@ def smooth_alpha_edges(
     """
     r, g, b, a = img.split()
     a_smooth = a.filter(ImageFilter.GaussianBlur(radius=blur_radius))
-    a_data = list(a.getdata())
-    a_smooth_data = list(a_smooth.getdata())
+    a_data = list(a.get_flattened_data())
+    a_smooth_data = list(a_smooth.get_flattened_data())
 
     a_result = []
     for orig, smooth in zip(a_data, a_smooth_data):

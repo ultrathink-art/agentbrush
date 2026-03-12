@@ -57,7 +57,7 @@ def test_smooth_produces_softer_edges(black_bg_with_circle, tmp_path):
     assert result.success
     # Check for semi-transparent pixels at edge (alpha between 0-255)
     img = Image.open(out)
-    data = list(img.getdata())
+    data = list(img.get_flattened_data())
     semi_transparent = [p for p in data if 0 < p[3] < 255]
     assert len(semi_transparent) > 0
 

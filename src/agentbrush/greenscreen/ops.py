@@ -50,7 +50,7 @@ def _sweep_remaining_green(
 
 def _is_pre_transparent(img: Image.Image, min_transparent_pct: float = 10.0) -> bool:
     """Detect if OpenAI pre-removed the green screen (returns RGBA with alpha=0)."""
-    data = list(img.getdata())
+    data = list(img.get_flattened_data())
     total = len(data)
     transparent = sum(1 for p in data if p[3] == 0)
     return (100.0 * transparent / total) > min_transparent_pct if total else False
