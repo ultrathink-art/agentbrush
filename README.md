@@ -55,7 +55,7 @@ result.summary()       # Human-readable string
 
 ```bash
 # Background removal
-agentbrush remove-bg input.png output.png --color black --threshold 25 --smooth
+agentbrush remove-bg input.png output.png --color white --smooth
 
 # Green screen removal
 agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
@@ -96,12 +96,12 @@ Exit codes: `0` = success, `1` = validation failure, `2` = input error.
 
 ### Background Removal
 
-Edge-based flood fill removes the background while preserving artwork that threshold-based tools destroy. The colorful owl below keeps every feather edge, outline, and interior shadow intact — only the solid black background is removed:
+Edge-based flood fill removes the background while preserving artwork that threshold-based tools destroy. The colorful owl below keeps every feather edge, outline, and sticker border intact — only the solid white background is removed:
 
-![Background removal: colorful owl on black to transparent](docs/images/compare_01_removebg.png)
+![Background removal: colorful owl on white to transparent](docs/images/compare_01_removebg.png)
 
 ```bash
-agentbrush remove-bg owl.png cutout.png --color black --threshold 25 --smooth
+agentbrush remove-bg owl.png cutout.png --color white --smooth
 ```
 
 ### Green Screen Removal
