@@ -1,6 +1,6 @@
 ---
 name: agent-brush
-description: Image editing toolkit for AI agents. Use when processing, editing, or validating images. Background removal, compositing, text overlays, resizing, format conversion, and spec validation against presets (social media, icons, thumbnails, print-on-demand).
+description: Image editing toolkit for AI agents. Use when processing, editing, or validating images. Background removal, compositing, text overlays, resizing, format conversion, and spec validation against presets (social media, icons, thumbnails).
 allowed-tools: Bash(python *), Bash(agentbrush *), Read, Glob
 ---
 
@@ -92,10 +92,6 @@ agentbrush validate check image.png --preset icon-ios
 # Validate with custom spec
 agentbrush validate check image.png --width 800 --height 600 --transparent
 
-# POD presets (backward compat via --type)
-agentbrush validate check design.png --preset tshirt
-agentbrush validate check design.png --type sticker
-
 # Compare source vs processed (verify bg removal didn't damage artwork)
 agentbrush validate compare source.png processed.png --max-loss 10
 ```
@@ -148,11 +144,6 @@ print(result.transparent_pct)  # Transparency percentage
 | `thumbnail` | 400 | 400 | Thumbnails, previews |
 | `banner` | 1920 | 480 | Website/profile banners |
 | `avatar` | 256 | 256 | Profile avatars |
-| `tshirt` | 4500 | 5400 | T-shirt print area |
-| `hoodie` | 4500 | 5400 | Hoodie print area |
-| `mug` | 2700 | 1050 | Mug wrap area |
-| `sticker` | 1664 | 1664 | Die-cut sticker |
-| `poster` | 5400 | 7200 | Poster print area |
 
 ## Best Practices
 
@@ -164,7 +155,6 @@ print(result.transparent_pct)  # Transparency percentage
 
 ## Additional Resources
 
-- For POD product specs, see [references/product-specs.md](references/product-specs.md)
 - For common issues and fixes, see [references/troubleshooting.md](references/troubleshooting.md)
 
 ## Standalone Scripts

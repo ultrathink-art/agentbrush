@@ -226,22 +226,9 @@ from agentbrush.core import (
 | `banner` | 1920 | 480 | - | Website/profile banners |
 | `avatar` | 256 | 256 | No | Profile avatars |
 
-### Print-on-Demand
+### Custom & Domain-Specific
 
-POD presets are also available via `--preset` or `--type` (backward compat):
-
-| Preset | Width | Height | Transparent | Notes |
-|--------|-------|--------|-------------|-------|
-| `tshirt` | 4500 | 5400 | Required | Apparel |
-| `hoodie` | 4500 | 5400 | Required | Apparel |
-| `hat` | 1890 | 765 | Required | Wide horizontal |
-| `mug` | 2700 | 1050 | Recommended | Wrap-around |
-| `sticker` | 1664 | 1664 | Required | Die-cut, single shape |
-| `deskmat` | 9200 | 4500 | No | Large format |
-| `poster` | 5400 | 7200 | No | Portrait |
-| `tote` | 3900 | 4800 | Required | Apparel |
-
-For detailed POD specs, see [docs/presets/pod.md](docs/presets/pod.md).
+Define custom specs inline or use domain-specific presets (e.g., print-on-demand). See [docs/presets/](docs/presets/) for additional preset packs.
 
 ## Why Edge-Based Flood Fill?
 
@@ -268,7 +255,6 @@ Step-by-step pipeline walkthroughs:
 
 - [Social Media Images](docs/examples/social_media_images.md) — OG images, thumbnails, avatars
 - [Background Removal](docs/examples/background_removal.md) — black bg, white bg, green screen techniques
-- [POD Workflows](docs/examples/pod_workflows.md) — stickers, t-shirts, mugs, and other products
 
 ## Testing
 

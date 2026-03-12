@@ -4,8 +4,8 @@
 
 ### Validate Module
 - Added 9 general-purpose presets: `social-og`, `social-square`, `social-story`, `favicon`, `icon-ios`, `icon-android`, `thumbnail`, `banner`, `avatar`
-- `--preset` is now the primary validation flag (works for both general and POD presets)
-- `--type` retained for backward compatibility (POD presets only)
+- `--preset` is now the primary validation flag (works for both general and domain-specific presets)
+- `--type` retained for backward compatibility
 - Custom specs via `--width`, `--height`, `--transparent` CLI flags
 - New exports: `PRESETS`, `POD_PRESETS`, `ALL_PRESETS` (plus `PRODUCT_SPECS` alias)
 
@@ -14,13 +14,12 @@
 - `validate` help: generalized from "product specs" to "presets or custom specs"
 
 ### Docs
-- README: leads with universal use cases (bg removal, resize, social presets)
+- README: general-purpose only — POD presets/workflows moved to `docs/presets/`
 - SKILL.md: rewritten as general-purpose image toolkit
 - New: `docs/examples/social_media_images.md` — OG images, avatars, icons
 - New: `docs/examples/background_removal.md` — general bg removal guide
-- Consolidated: `docs/examples/pod_workflows.md` — all POD pipelines in one doc
-- POD dimensions table moved to `docs/presets/pod.md`
-- Removed individual pipeline docs (sticker, tshirt, mug) — content in pod_workflows.md
+- Domain-specific presets (POD) available in `docs/presets/pod.md`
+- Domain-specific workflows available in `docs/examples/pod_workflows.md`
 
 ### Internal
 - `connectivity.py` docstrings: generalized to icons/logos/sprites
