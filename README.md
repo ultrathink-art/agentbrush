@@ -96,62 +96,59 @@ Exit codes: `0` = success, `1` = validation failure, `2` = input error.
 
 ### Background Removal
 
-Edge-based flood fill removes the background while preserving internal dark details that threshold-based tools destroy.
+Edge-based flood fill removes the background while preserving internal dark details that threshold-based tools destroy. Here a cyberpunk robot with glowing cyan circuitry keeps every neon edge and interior shadow intact:
 
-![Background removal: black bg to transparent](docs/images/compare_01_removebg.png)
+![Background removal: cyberpunk robot on black to transparent](docs/images/compare_01_removebg.png)
 
 ```bash
-agentbrush remove-bg input.png output.png --color black --threshold 25 --smooth
+agentbrush remove-bg robot.png cutout.png --color black --threshold 25 --smooth
 ```
 
 ### Green Screen Removal
 
-Multi-pass pipeline: flood fill from edges, trapped patch sweep, upscale with halo cleanup.
+Multi-pass pipeline handles fine fur, hair, and complex outlines. The arctic fox below has thousands of wispy fur strands at the boundary — flood fill + trapped patch sweep + 3× upscale + halo cleanup preserves them all:
 
-![Green screen removal](docs/images/compare_02_greenscreen.png)
-
-```bash
-agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
-```
-
-### Border Cleanup
-
-Iterative erosion removes white "sticker border" artifacts and green halos left by AI image generators.
-
-![Border artifact cleanup](docs/images/compare_03_border.png)
+![Green screen removal: arctic fox with fine fur detail](docs/images/compare_02_greenscreen.png)
 
 ```bash
-agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 20
+agentbrush greenscreen fox.png cutout.png --upscale 3 --halo-passes 25
+agentbrush border-cleanup cutout.png clean.png --green-halo-passes 25 --alpha-smooth
 ```
 
 ### Text Rendering
 
-Accurate Pillow-based text rendering on new or existing canvases — no AI text mangling.
+Accurate Pillow-based text rendering — layer multiple text elements with different sizes, colors, and positions. No AI text mangling, every character pixel-perfect:
 
-![Text rendering on canvas](docs/images/compare_04_text.png)
+![Text rendering: conference badge with 7 styled text layers](docs/images/compare_03_text.png)
 
 ```bash
-agentbrush text new:1200x630 output.png "HELLO WORLD" --font mono --bold --size 72 --center
+agentbrush text badge_bg.png step1.png "AGENTCON" --font mono --bold --size 96 --center
+agentbrush text step1.png step2.png "2026" --font mono --bold --size 48 --color "120,80,255,255" --center
+agentbrush text step2.png step3.png "SPEAKER" --font mono --bold --size 36 --color "255,200,50,255" --center
+agentbrush text step3.png final.png "Dr. Agent Smith" --font mono --size 64 --center
 ```
 
 ### Compositing
 
-Layer images with automatic centering, fit-to-canvas, and alpha blending.
+Combine cutouts, backgrounds, and text into finished assets. The robot cutout from step 1 is placed on a gradient background with text overlay — a complete workflow in three commands:
 
-![Image compositing](docs/images/compare_05_composite.png)
+![Compositing: cutout + background + text = finished asset](docs/images/compare_04_composite.png)
 
 ```bash
-agentbrush composite paste-centered output.png --overlay art.png --canvas 800x400 --fit
+agentbrush composite gradient.png robot_cutout.png composed.png --position 30,15 --resize 600x600
+agentbrush text composed.png final.png "AgentBrush" --font mono --bold --size 64 --color "0,220,255,255"
 ```
 
-### Resize & Pad
+### Resize & Validate
 
-Resize to exact dimensions with letterbox padding to preserve aspect ratio.
+Resize to exact dimensions with letterbox padding, then validate against platform presets. Square badge → OG image in one command:
 
-![Resize with padding](docs/images/compare_06_resize.png)
+![Resize with padding to social-og dimensions](docs/images/compare_05_resize.png)
 
 ```bash
-agentbrush resize input.png output.png --width 1200 --height 630 --fit --pad
+agentbrush resize badge.png og_image.png --width 1200 --height 630 --fit --pad --pad-color "20,15,60,255"
+agentbrush validate check og_image.png --preset social-og
+# [OK] Size: 1200x630px — preset: social-og ✓
 ```
 
 ## Agent Skills

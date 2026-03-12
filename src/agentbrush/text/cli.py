@@ -64,6 +64,7 @@ def run(args):
             position=pos, font_name=args.font,
             font_size=args.size, bold=args.bold,
             color=color, max_width=args.max_width,
+            center=args.center,
         )
 
     print(result.summary())

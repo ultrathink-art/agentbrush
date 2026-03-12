@@ -27,6 +27,7 @@ def add_text(
     color: Tuple[int, int, int, int] = (255, 255, 255, 255),
     anchor: str = "lt",
     max_width: Optional[int] = None,
+    center: bool = False,
 ) -> Result:
     """Render text onto an image.
 
@@ -41,6 +42,7 @@ def add_text(
         color: RGBA text color tuple.
         anchor: Pillow text anchor (e.g. 'lt'=left-top, 'mm'=middle-middle).
         max_width: Optional max width in pixels — text wraps to fit.
+        center: Center text horizontally on canvas (Y from position is used).
 
     Returns:
         Result with operation stats.
@@ -68,9 +70,13 @@ def add_text(
 
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font, anchor="lt")
-        # Correct for non-zero y-offset at large sizes
         y_offset = bbox[1]
-        draw.text((x, y - y_offset), line, font=font, fill=color, anchor="lt")
+        if center:
+            text_width = bbox[2] - bbox[0]
+            lx = (img.width - text_width) // 2
+        else:
+            lx = x
+        draw.text((lx, y - y_offset), line, font=font, fill=color, anchor="lt")
         y += line_height
 
     img = Image.alpha_composite(img, overlay)
