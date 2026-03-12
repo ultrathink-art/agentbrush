@@ -1,12 +1,12 @@
 ---
 name: agent-brush
-description: Image editing toolkit for AI agents. Use when processing images for print-on-demand products (stickers, t-shirts, mugs, hoodies, posters), removing backgrounds, adding text overlays, compositing layers, or validating designs against product specs.
+description: Image editing toolkit for AI agents. Use when processing, editing, or validating images. Background removal, compositing, text overlays, resizing, format conversion, and spec validation against presets (social media, icons, thumbnails, print-on-demand).
 allowed-tools: Bash(python *), Bash(agentbrush *), Read, Glob
 ---
 
 # AgentBrush — Image Editing for AI Agents
 
-Production-tested image processing toolkit. Handles background removal, green screen processing, border cleanup, text rendering, compositing, resizing, validation, and format conversion.
+Image processing toolkit with background removal, green screen processing, border cleanup, text rendering, compositing, resizing, validation, and format conversion.
 
 ## Quick Reference
 
@@ -31,14 +31,14 @@ agentbrush remove-bg input.png output.png --color "24,242,41" --threshold 40
 # Standard green screen removal
 agentbrush greenscreen input.png output.png
 
-# With upscale + halo cleanup (for print-quality output)
+# With upscale + halo cleanup
 agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
 ```
 
-### Border Cleanup (sticker post-processing)
+### Border Cleanup (edge artifact removal)
 
 ```bash
-# Remove white AI sticker border
+# Remove white border artifacts from AI-generated images
 agentbrush border-cleanup input.png output.png --passes 15 --threshold 185
 
 # Full cleanup: white border + green halo + alpha smoothing
@@ -52,7 +52,7 @@ agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 2
 agentbrush text input.png output.png "HELLO WORLD" --font mono --bold --size 72 --color "255,255,255,255"
 
 # Render text on new canvas (use new:WxH as input)
-agentbrush text new:1664x1664 output.png "BUG\nFEATURE" --font mono --bold --size 120 --center
+agentbrush text new:1200x630 output.png "Title Text" --font mono --bold --size 80 --center
 ```
 
 ### Compositing
@@ -61,32 +61,40 @@ agentbrush text new:1664x1664 output.png "BUG\nFEATURE" --font mono --bold --siz
 # Overlay image onto base
 agentbrush composite base.png overlay.png output.png --position 100,200
 
-# Center artwork on product canvas
-agentbrush composite paste-centered output.png --overlay artwork.png --canvas 4500x5400 --fit
+# Center artwork on canvas
+agentbrush composite paste-centered output.png --overlay artwork.png --canvas 1200x630 --fit
 ```
 
-### Resize (with product presets)
+### Resize
 
 ```bash
-# Resize for specific product
-agentbrush resize input.png output.png --width 4500 --height 5400
+# Resize to exact dimensions
+agentbrush resize input.png output.png --width 1200 --height 630
 
 # Scale by factor
 agentbrush resize input.png output.png --scale 3.0
 
 # Fit within bounds preserving aspect ratio
-agentbrush resize input.png output.png --width 2700 --height 1050 --fit
+agentbrush resize input.png output.png --width 1080 --height 1080 --fit
 
 # Fit and pad to exact dimensions
-agentbrush resize input.png output.png --width 2700 --height 1050 --pad
+agentbrush resize input.png output.png --width 1200 --height 630 --pad
 ```
 
-### Validation (design QA)
+### Validation (preset-based)
 
 ```bash
-# Validate against product specs
+# Validate against built-in presets
+agentbrush validate check image.png --preset social-og
+agentbrush validate check image.png --preset favicon
+agentbrush validate check image.png --preset icon-ios
+
+# Validate with custom spec
+agentbrush validate check image.png --width 800 --height 600 --transparent
+
+# POD presets (backward compat via --type)
+agentbrush validate check design.png --preset tshirt
 agentbrush validate check design.png --type sticker
-agentbrush validate check design.png --type tshirt
 
 # Compare source vs processed (verify bg removal didn't damage artwork)
 agentbrush validate compare source.png processed.png --max-loss 10
@@ -103,7 +111,6 @@ agentbrush convert input.png output.webp --quality 90
 
 ```bash
 agentbrush generate --provider openai --prompt "cute cat coding" --output cat.png
-agentbrush generate --provider pollinations --prompt "robot painting" --output robot.png
 ```
 
 ## Python API
@@ -128,31 +135,36 @@ print(result.width)       # Output dimensions
 print(result.transparent_pct)  # Transparency percentage
 ```
 
-## Product Dimensions Reference
+## Available Presets
 
-| Product       | Width  | Height | Transparent | Notes                     |
-|---------------|--------|--------|-------------|---------------------------|
-| T-shirt       | 4500   | 5400   | Yes         | Apparel — no solid bg     |
-| Hoodie        | 4500   | 5400   | Yes         | Apparel — no solid bg     |
-| Hat           | 1890   | 765    | Yes         | Wide horizontal format    |
-| Mug (11oz)    | 2700   | 1050   | Yes         | Wrap-around print area    |
-| Mug (15oz)    | 2700   | 1140   | Yes         | Taller wrap area          |
-| Sticker       | 1664   | 1664   | Yes         | Square, die-cut shape     |
-| Desk mat      | 9200   | 4500   | No          | Large format              |
-| Poster        | 5400   | 7200   | No          | Portrait orientation      |
-| Sticker sheet | 825    | 525    | Yes         | 6x4" multi-sticker layout |
+| Preset | Width | Height | Use Case |
+|--------|-------|--------|----------|
+| `social-og` | 1200 | 630 | Open Graph / link previews |
+| `social-square` | 1080 | 1080 | Instagram, social posts |
+| `social-story` | 1080 | 1920 | Stories, reels, vertical |
+| `favicon` | 32 | 32 | Browser favicon |
+| `icon-ios` | 1024 | 1024 | iOS app icon |
+| `icon-android` | 512 | 512 | Android app icon |
+| `thumbnail` | 400 | 400 | Thumbnails, previews |
+| `banner` | 1920 | 480 | Website/profile banners |
+| `avatar` | 256 | 256 | Profile avatars |
+| `tshirt` | 4500 | 5400 | T-shirt print area |
+| `hoodie` | 4500 | 5400 | Hoodie print area |
+| `mug` | 2700 | 1050 | Mug wrap area |
+| `sticker` | 1664 | 1664 | Die-cut sticker |
+| `poster` | 5400 | 7200 | Poster print area |
 
-## Critical Rules
+## Best Practices
 
 1. **NEVER use threshold-based background removal** — destroys internal outlines/details. Always use edge-based flood fill (`remove-bg`).
-2. **Stickers must be a single continuous shape** — no floating/detached elements. Use `validate check --type sticker` to verify.
-3. **Apparel designs MUST have transparent backgrounds** — validate with `validate check --type tshirt`.
-4. **Use Pillow for text, not AI generation** — AI mangles long text. Use `agentbrush text` for accurate rendering.
-5. **Green screen technique**: prompt AI for "#00FF00 background", then use `agentbrush greenscreen` for clean removal.
+2. **Use Pillow for text, not AI generation** — AI mangles long text. Use `agentbrush text` for accurate rendering.
+3. **Green screen technique**: prompt AI for "#00FF00 background", then use `agentbrush greenscreen` for clean removal.
+4. **Validate before delivery** — use `agentbrush validate check` with the appropriate preset to catch dimension/format issues early.
+5. **Compare after bg removal** — `agentbrush validate compare` catches artwork damage from processing.
 
 ## Additional Resources
 
-- For complete product specs and print guidelines, see [references/product-specs.md](references/product-specs.md)
+- For POD product specs, see [references/product-specs.md](references/product-specs.md)
 - For common issues and fixes, see [references/troubleshooting.md](references/troubleshooting.md)
 
 ## Standalone Scripts
@@ -161,5 +173,5 @@ The `scripts/` directory contains standalone wrappers for each command. These wo
 
 ```bash
 python scripts/remove_bg.py input.png output.png --color black
-python scripts/validate.py check design.png --type sticker
+python scripts/validate.py check image.png --preset social-og
 ```

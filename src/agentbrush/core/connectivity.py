@@ -1,4 +1,8 @@
-"""Die-cut connectivity: single shape verification via 8-connected BFS."""
+"""Single-shape connectivity verification via 8-connected BFS.
+
+Useful for die-cut stickers, icons, logos, sprites, and any asset that
+must form one continuous opaque region.
+"""
 from __future__ import annotations
 
 from collections import deque
@@ -54,8 +58,8 @@ def ensure_single_shape(
 ) -> Tuple[Image.Image, int]:
     """Keep only the largest connected component (8-connected).
 
-    Removes all floating/detached elements. Essential for die-cut stickers
-    where the cutting machine follows a single outline.
+    Removes all floating/detached elements. Useful for die-cut stickers,
+    icons, logos, sprites — any asset needing a single continuous shape.
 
     Returns:
         Tuple of (modified image, number of pixels removed).

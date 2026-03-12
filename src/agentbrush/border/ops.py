@@ -1,7 +1,7 @@
-"""Border erosion and halo removal for sticker cleanup.
+"""Border artifact erosion and edge halo removal.
 
 Handles:
-- White sticker border erosion (AI generators add a white outline)
+- White border erosion (AI generators often add unwanted white outlines)
 - Green halo erosion (anti-aliased fringe after green screen removal)
 - Alpha edge smoothing (Gaussian blur on edges, interior preserved)
 """
@@ -22,7 +22,7 @@ def _erode_white_border(
     passes: int = 15,
     threshold: int = 185,
 ) -> tuple:
-    """Iteratively remove light pixels adjacent to transparent (white sticker border).
+    """Iteratively remove light pixels adjacent to transparent (border artifacts).
 
     Threshold < 170 eats into colored artwork. 185 is the safe default.
     """
@@ -108,7 +108,7 @@ def cleanup_border(
     alpha_smooth: bool = False,
     alpha_blur_radius: float = 1.5,
 ) -> Result:
-    """Clean up sticker borders: white border erosion + optional green halo removal.
+    """Remove border artifacts: white edge erosion + optional green halo removal.
 
     Args:
         input_path: Source image path.
@@ -116,7 +116,7 @@ def cleanup_border(
         passes: Number of white border erosion passes.
         threshold: White pixel threshold (R,G,B all above this = white).
         green_halo_passes: Number of green halo erosion passes (0 to skip).
-        alpha_smooth: Apply Gaussian alpha smoothing for die-cut outline.
+        alpha_smooth: Apply Gaussian alpha smoothing on edges.
         alpha_blur_radius: Blur radius for alpha smoothing.
 
     Returns:

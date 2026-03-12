@@ -4,11 +4,9 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent--skills-compatible-purple.svg)](https://agentskills.io)
-[![Tests](https://img.shields.io/badge/tests-126%20passed-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-134%20passed-brightgreen.svg)](#testing)
 
-Image editing toolkit for AI agents. Photoshop for Claude Code, Codex, Cursor, and friends.
-
-Built from 134 production sessions of print-on-demand image processing. Battle-tested algorithms for background removal, green screen processing, border cleanup, text rendering, compositing, validation, and more.
+Image editing toolkit for AI agents. Background removal, compositing, text rendering, resizing, format conversion, and spec validation.
 
 ## Install
 
@@ -27,21 +25,17 @@ pip install agentbrush[generate]
 ### Python API
 
 ```python
-from agentbrush import remove_background, remove_greenscreen, cleanup_border
+from agentbrush import remove_background, resize_image, validate_design
 
-# Remove black background (edge-based flood fill, safe for artwork)
-result = remove_background("input.png", "output.png", color="black", threshold=25)
+# Remove background (edge-based flood fill, safe for artwork)
+result = remove_background("photo.png", "cutout.png", color="white")
+
+# Resize for social media
+result = resize_image("cutout.png", "og_image.png", width=1200, height=630, pad=True)
+
+# Validate against a preset
+result = validate_design("og_image.png", preset="social-og")
 print(result.summary())
-# [OK] output.png
-#   Size: 1024x1024px
-#   Transparent: 72.3%  Opaque: 27.7%
-#   pixels_removed: 758432
-
-# Remove green screen (multi-pass: flood fill + color sweep)
-result = remove_greenscreen("input.png", "output.png", halo_passes=20)
-
-# Clean up white sticker border from AI-generated art
-result = cleanup_border("input.png", "output.png", passes=15, threshold=185)
 ```
 
 Every function returns a `Result` object:
@@ -66,28 +60,31 @@ agentbrush remove-bg input.png output.png --color black --threshold 25 --smooth
 # Green screen removal
 agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
 
-# Border cleanup
+# Border artifact cleanup
 agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 20
 
 # Text rendering
 agentbrush text input.png output.png "HELLO" --font mono --bold --size 72
-agentbrush text new:1664x1664 output.png "BUG\nFEATURE" --bold --center
+agentbrush text new:1200x630 output.png "Title Text" --bold --center
 
 # Compositing
 agentbrush composite base.png art.png output.png --position 100,200
-agentbrush composite paste-centered output.png --overlay art.png --canvas 4500x5400 --fit
+agentbrush composite paste-centered output.png --overlay art.png --canvas 1200x630 --fit
 
 # Resize
-agentbrush resize input.png output.png --width 4500 --height 5400
+agentbrush resize input.png output.png --width 1200 --height 630
 agentbrush resize input.png output.png --scale 3.0
-agentbrush resize input.png output.png --width 2700 --height 1050 --fit --pad
+agentbrush resize input.png output.png --width 1080 --height 1080 --fit --pad
 
-# Validate design against product specs
-agentbrush validate check design.png --type sticker
+# Validate against presets
+agentbrush validate check image.png --preset social-og
+agentbrush validate check image.png --preset favicon
+agentbrush validate check image.png --width 800 --height 600 --transparent
 agentbrush validate compare source.png processed.png --max-loss 10
 
 # Format conversion
 agentbrush convert input.png output.jpg --quality 95
+agentbrush convert input.png output.webp --quality 90
 
 # AI image generation (requires openai package)
 agentbrush generate --provider openai --prompt "cat coding" --output cat.png
@@ -103,11 +100,7 @@ AgentBrush ships as an [Agent Skills](https://agentskills.io) package. Copy `ski
 cp -r skill/agent-brush/ .claude/skills/agent-brush/
 ```
 
-Claude Code (and other compatible tools) will automatically discover the skill and use it when processing images. The skill includes:
-
-- **SKILL.md** — instructions and quick reference for the agent
-- **references/** — product specs, troubleshooting guides
-- **scripts/** — standalone wrappers that work without `pip install`
+Claude Code (and other compatible tools) will automatically discover the skill and use it when processing images.
 
 ## Usage Without Install
 
@@ -117,13 +110,12 @@ The standalone scripts work directly from a git clone — no `pip install` neede
 git clone https://github.com/ultrathink-art/agentbrush.git
 cd agentbrush
 
-# Run scripts directly (auto-detects src/ directory)
 python skill/agent-brush/scripts/remove_bg.py input.png output.png --color black
-python skill/agent-brush/scripts/validate.py check design.png --type sticker
-python skill/agent-brush/scripts/greenscreen.py input.png output.png --upscale 3
+python skill/agent-brush/scripts/validate.py check image.png --preset social-og
+python skill/agent-brush/scripts/resize.py input.png output.png --width 1200 --height 630
 ```
 
-Requirements: **Python >= 3.10** and **Pillow >= 12.1** (`pip install 'Pillow>=12.1'`). Older versions fail at runtime (`get_flattened_data` API requires Pillow 12.1+, type union syntax requires Python 3.10+).
+Requirements: **Python >= 3.10** and **Pillow >= 12.1** (`pip install 'Pillow>=12.1'`).
 
 ## Modules
 
@@ -131,11 +123,11 @@ Requirements: **Python >= 3.10** and **Pillow >= 12.1** (`pip install 'Pillow>=1
 |--------|-------------|-------------|
 | `background` | Edge-based flood fill bg removal | `remove_background()` |
 | `greenscreen` | Multi-pass green screen pipeline | `remove_greenscreen()` |
-| `border` | White border erosion + green halo | `cleanup_border()` |
+| `border` | Border artifact erosion + halo cleanup | `cleanup_border()` |
 | `text` | Pillow text rendering (accurate) | `add_text()`, `render_text()` |
 | `composite` | Image layering + centering | `composite()`, `paste_centered()` |
 | `resize` | Resize with fit/pad/scale modes | `resize_image()` |
-| `validate` | Design QA against product specs | `validate_design()`, `compare_images()` |
+| `validate` | Spec validation against presets | `validate_design()`, `compare_images()` |
 | `convert` | Format conversion (PNG/JPEG/WEBP) | `convert_image()` |
 | `generate` | AI image generation (optional) | `generate_image()` |
 
@@ -159,19 +151,38 @@ from agentbrush.core import (
 )
 ```
 
-## Product Presets
+## Presets
 
-Built-in dimensions for print-on-demand products:
+### General Purpose
 
-| Product | Width | Height | Transparent | Notes |
-|---------|-------|--------|-------------|-------|
-| T-shirt | 4500 | 5400 | Required | Apparel |
-| Hoodie | 4500 | 5400 | Required | Apparel |
-| Hat | 1890 | 765 | Required | Wide horizontal |
-| Mug (11oz) | 2700 | 1050 | Recommended | Wrap-around |
-| Sticker | 1664 | 1664 | Required | Die-cut, single shape |
-| Desk mat | 9200 | 4500 | No | Large format |
-| Poster | 5400 | 7200 | No | Portrait |
+| Preset | Width | Height | Transparent | Use Case |
+|--------|-------|--------|-------------|----------|
+| `social-og` | 1200 | 630 | No | Open Graph / link previews |
+| `social-square` | 1080 | 1080 | No | Instagram, social posts |
+| `social-story` | 1080 | 1920 | No | Stories, reels, vertical |
+| `favicon` | 32 | 32 | Yes | Browser favicon |
+| `icon-ios` | 1024 | 1024 | No | iOS app icon |
+| `icon-android` | 512 | 512 | Yes | Android app icon |
+| `thumbnail` | 400 | 400 | - | Thumbnails, previews |
+| `banner` | 1920 | 480 | - | Website/profile banners |
+| `avatar` | 256 | 256 | No | Profile avatars |
+
+### Print-on-Demand
+
+POD presets are also available via `--preset` or `--type` (backward compat):
+
+| Preset | Width | Height | Transparent | Notes |
+|--------|-------|--------|-------------|-------|
+| `tshirt` | 4500 | 5400 | Required | Apparel |
+| `hoodie` | 4500 | 5400 | Required | Apparel |
+| `hat` | 1890 | 765 | Required | Wide horizontal |
+| `mug` | 2700 | 1050 | Recommended | Wrap-around |
+| `sticker` | 1664 | 1664 | Required | Die-cut, single shape |
+| `deskmat` | 9200 | 4500 | No | Large format |
+| `poster` | 5400 | 7200 | No | Portrait |
+| `tote` | 3900 | 4800 | Required | Apparel |
+
+For detailed POD specs, see [docs/presets/pod.md](docs/presets/pod.md).
 
 ## Why Edge-Based Flood Fill?
 
@@ -194,11 +205,11 @@ removes ALL dark pixels       removes ONLY edge-connected dark pixels
 
 ## Examples
 
-Full pipeline guides with code:
+Pipeline guides:
 
-- [Sticker Pipeline](docs/examples/sticker_pipeline.md) — AI art -> green screen -> border cleanup -> validate die-cut
-- [T-Shirt Pipeline](docs/examples/tshirt_pipeline.md) — artwork -> transparent bg -> resize to 4500x5400
-- [Mug Pipeline](docs/examples/mug_pipeline.md) — sticker adaptation -> wrap format -> multi-sticker composition
+- [Social Media Images](docs/examples/social_media_images.md) — OG images, thumbnails, avatars
+- [Background Removal](docs/examples/background_removal.md) — black bg, white bg, green screen techniques
+- [POD Workflows](docs/examples/pod_workflows.md) — stickers, t-shirts, mugs, and other products
 
 ## Testing
 
@@ -207,7 +218,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-All tests use synthetic Pillow-generated fixtures (no production images). 126 tests covering all modules.
+All tests use synthetic Pillow-generated fixtures (no production images).
 
 ## Dependencies
 

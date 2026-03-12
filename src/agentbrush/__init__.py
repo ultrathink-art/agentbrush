@@ -1,6 +1,6 @@
 """AgentBrush — Image editing toolkit for AI agents."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from agentbrush.core.result import Result
 from agentbrush.background.ops import remove_background

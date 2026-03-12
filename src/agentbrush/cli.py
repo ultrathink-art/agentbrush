@@ -6,11 +6,11 @@ Usage:
 Commands:
     remove-bg        Remove solid-color background via edge-based flood fill
     greenscreen      Remove green screen background (multi-pass pipeline)
-    border-cleanup   Remove white sticker border + optional green halo
+    border-cleanup   Remove border artifacts and edge halos
     text             Render text onto an image or new canvas
     composite        Alpha-composite overlay onto base image
     resize           Resize image (exact, fit, pad, or scale)
-    validate         Validate design against product specs
+    validate         Validate image against presets or custom specs
     convert          Convert image format (PNG, JPEG, WEBP, etc.)
     generate         Generate image from text prompt (OpenAI/Pollinations)
 """

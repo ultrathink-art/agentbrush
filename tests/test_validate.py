@@ -1,8 +1,9 @@
-"""Tests for validate module (port of bin/design-qa)."""
+"""Tests for validate module — presets, POD specs, and custom validation."""
 from PIL import Image, ImageDraw
 
 from agentbrush.validate.ops import (
-    validate_design, compare_images, detect_product_type, PRODUCT_SPECS,
+    validate_design, compare_images, detect_product_type,
+    PRODUCT_SPECS, PRESETS, POD_PRESETS, ALL_PRESETS,
 )
 
 
@@ -184,6 +185,95 @@ def test_compare_file_not_found(tmp_path):
 
 
 def test_product_specs_complete():
-    """All expected product types should be in specs."""
+    """All expected product types should be in POD specs (backward compat)."""
     expected = {"tshirt", "hoodie", "hat", "mug", "sticker", "deskmat", "poster", "tote"}
     assert set(PRODUCT_SPECS.keys()) == expected
+    assert set(POD_PRESETS.keys()) == expected
+
+
+def test_general_presets_complete():
+    """General-purpose presets should include social, icon, and utility presets."""
+    expected = {
+        "social-og", "social-square", "social-story",
+        "favicon", "icon-ios", "icon-android",
+        "thumbnail", "banner", "avatar",
+    }
+    assert set(PRESETS.keys()) == expected
+
+
+def test_all_presets_merged():
+    """ALL_PRESETS should contain both general and POD presets."""
+    for key in PRESETS:
+        assert key in ALL_PRESETS
+    for key in POD_PRESETS:
+        assert key in ALL_PRESETS
+
+
+def test_validate_preset_social_og(tmp_path):
+    """Validate against social-og preset."""
+    img = Image.new("RGBA", (1200, 630), (100, 150, 200, 255))
+    path = tmp_path / "og_image.png"
+    img.save(path)
+
+    result = validate_design(str(path), preset="social-og")
+    assert result.success
+    assert result.metadata["preset"] == "social-og"
+
+
+def test_validate_preset_social_og_wrong_size(tmp_path):
+    """Wrong dimensions for social-og should warn."""
+    img = Image.new("RGBA", (500, 500), (100, 150, 200, 255))
+    path = tmp_path / "wrong_og.png"
+    img.save(path)
+
+    result = validate_design(str(path), preset="social-og")
+    assert any("DIMENSIONS" in w for w in result.warnings) or \
+           any("ASPECT RATIO" in e for e in result.errors)
+
+
+def test_validate_preset_favicon(tmp_path):
+    """Validate against favicon preset."""
+    img = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(img)
+    draw.ellipse([4, 4, 28, 28], fill=(255, 100, 50, 255))
+    path = tmp_path / "favicon.png"
+    img.save(path)
+
+    result = validate_design(str(path), preset="favicon")
+    assert result.success
+
+
+def test_validate_preset_unknown():
+    """Unknown preset should error."""
+    result = validate_design("/dev/null", preset="nonexistent-preset")
+    assert not result.success
+    assert any("Unknown preset" in e for e in result.errors)
+
+
+def test_validate_custom_spec(tmp_path):
+    """Validate with custom width/height flags."""
+    img = Image.new("RGBA", (800, 600), (100, 100, 100, 255))
+    path = tmp_path / "custom.png"
+    img.save(path)
+
+    result = validate_design(str(path), width=800, height=600)
+    assert result.success
+    assert result.metadata["preset"] == "custom"
+
+
+def test_validate_preset_backward_compat(tmp_path):
+    """--type sticker still works as before."""
+    img = Image.new("RGBA", (1664, 1664), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    for i in range(0, 1200, 30):
+        draw.ellipse(
+            [200 + i % 400, 200 + i % 300, 250 + i % 400, 250 + i % 300],
+            fill=(i % 255, (i * 3) % 255, (i * 7) % 255, 255),
+        )
+    path = tmp_path / "compat_sticker.png"
+    img.save(path)
+
+    result = validate_design(str(path), product_type="sticker")
+    assert result.success
+    assert result.metadata["product_type"] == "sticker"

@@ -10,7 +10,7 @@ def add_parser(subparsers):
     """Register the border-cleanup subcommand."""
     p = subparsers.add_parser(
         "border-cleanup",
-        help="Remove white sticker border + optional green halo",
+        help="Remove border artifacts and edge halos",
     )
     p.add_argument("input", help="Input image path")
     p.add_argument("output", help="Output image path")

@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentbrush"
-version = "0.1.0"
-description = "Image editing toolkit for AI agents. Photoshop for Claude Code, Codex, Cursor, and friends."
+version = "0.2.0"
+description = "Image editing toolkit for AI agents. Background removal, compositing, text rendering, resizing, and validation."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
     { name = "Ultrathink", email = "ceo@ultrathink.art" },
 ]
-keywords = ["image-editing", "ai-agents", "pillow", "background-removal", "greenscreen"]
+keywords = ["image-editing", "ai-agents", "pillow", "background-removal", "greenscreen", "compositing", "resize", "validation"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

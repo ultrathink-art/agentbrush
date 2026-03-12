@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.2.0 (2026-03-12)
+
+### Validate Module
+- Added 9 general-purpose presets: `social-og`, `social-square`, `social-story`, `favicon`, `icon-ios`, `icon-android`, `thumbnail`, `banner`, `avatar`
+- `--preset` is now the primary validation flag (works for both general and POD presets)
+- `--type` retained for backward compatibility (POD presets only)
+- Custom specs via `--width`, `--height`, `--transparent` CLI flags
+- New exports: `PRESETS`, `POD_PRESETS`, `ALL_PRESETS` (plus `PRODUCT_SPECS` alias)
+
+### CLI
+- `border-cleanup` help: generalized from "sticker border" to "border artifacts"
+- `validate` help: generalized from "product specs" to "presets or custom specs"
+
+### Docs
+- README: leads with universal use cases (bg removal, resize, social presets)
+- SKILL.md: rewritten as general-purpose image toolkit
+- New: `docs/examples/social_media_images.md` — OG images, avatars, icons
+- New: `docs/examples/background_removal.md` — general bg removal guide
+- Consolidated: `docs/examples/pod_workflows.md` — all POD pipelines in one doc
+- POD dimensions table moved to `docs/presets/pod.md`
+- Removed individual pipeline docs (sticker, tshirt, mug) — content in pod_workflows.md
+
+### Internal
+- `connectivity.py` docstrings: generalized to icons/logos/sprites
+- `border/ops.py` docstrings: removed sticker-specific framing
+
+### Tests
+- 8 new tests for general presets, custom specs, and backward compat
+- 134 tests total (up from 126)
+
 ## 0.1.1 (2026-03-11)
 
 ### CLI

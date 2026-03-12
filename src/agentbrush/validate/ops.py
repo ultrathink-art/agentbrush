@@ -1,7 +1,8 @@
-"""Design validation — Python port of bin/design-qa.
+"""Design validation against presets and custom specs.
 
-Validates design files against product specs: dimensions, transparency,
-aspect ratio, visual complexity (sticker slop gate), layout detection.
+Validates images against dimension/transparency/aspect-ratio presets.
+Built-in presets for social media, icons, thumbnails, and print-on-demand.
+Custom specs via CLI flags (--width, --height, --transparent).
 No external dependencies (ImageMagick, tesseract) — pure Pillow.
 """
 from __future__ import annotations
@@ -15,7 +16,48 @@ from PIL import Image
 from agentbrush.core.result import Result
 
 
-PRODUCT_SPECS: Dict[str, Dict] = {
+# General-purpose presets (social, icons, thumbnails, banners)
+PRESETS: Dict[str, Dict] = {
+    "social-og": {
+        "width": 1200, "height": 630, "transparent": False,
+        "tolerance": 50, "aspect_min": 1.7, "aspect_max": 2.1,
+    },
+    "social-square": {
+        "width": 1080, "height": 1080, "transparent": False,
+        "tolerance": 50, "aspect_min": 0.95, "aspect_max": 1.05,
+    },
+    "social-story": {
+        "width": 1080, "height": 1920, "transparent": False,
+        "tolerance": 50, "aspect_min": 0.5, "aspect_max": 0.6,
+    },
+    "favicon": {
+        "width": 32, "height": 32, "transparent": True,
+        "tolerance": 0, "aspect_min": 1.0, "aspect_max": 1.0,
+    },
+    "icon-ios": {
+        "width": 1024, "height": 1024, "transparent": False,
+        "tolerance": 0, "aspect_min": 1.0, "aspect_max": 1.0,
+    },
+    "icon-android": {
+        "width": 512, "height": 512, "transparent": True,
+        "tolerance": 0, "aspect_min": 1.0, "aspect_max": 1.0,
+    },
+    "thumbnail": {
+        "width": 400, "height": 400,
+        "tolerance": 100, "aspect_min": 0.8, "aspect_max": 1.2,
+    },
+    "banner": {
+        "width": 1920, "height": 480,
+        "tolerance": 100, "aspect_min": 3.5, "aspect_max": 4.5,
+    },
+    "avatar": {
+        "width": 256, "height": 256, "transparent": False,
+        "tolerance": 50, "aspect_min": 1.0, "aspect_max": 1.0,
+    },
+}
+
+# Print-on-demand presets (kept for backward compat, not primary)
+POD_PRESETS: Dict[str, Dict] = {
     "tshirt": {
         "width": 4500, "height": 5400, "transparent": True,
         "apparel": True, "tolerance": 500,
@@ -57,6 +99,12 @@ PRODUCT_SPECS: Dict[str, Dict] = {
     },
 }
 
+# Backward compat alias
+PRODUCT_SPECS = POD_PRESETS
+
+# Merged dict: general presets + POD presets (general listed first)
+ALL_PRESETS: Dict[str, Dict] = {**PRESETS, **POD_PRESETS}
+
 # Filename patterns for auto-detection
 _TYPE_PATTERNS = {
     "tshirt": ["tee", "shirt", "tshirt"],
@@ -83,35 +131,84 @@ def detect_product_type(filename: str) -> Optional[str]:
 def validate_design(
     input_path: Union[str, Path],
     product_type: Optional[str] = None,
+    preset: Optional[str] = None,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    transparent: Optional[bool] = None,
 ) -> Result:
-    """Validate a design file against product specs.
+    """Validate an image against a preset, product type, or custom spec.
 
-    Checks: dimensions, aspect ratio, transparency, visual complexity
-    (stickers), sticker layout (poster-layout detection).
+    Resolution order for specs:
+    1. ``preset`` — looks up in ALL_PRESETS (general + POD)
+    2. ``product_type`` / ``--type`` — looks up in POD_PRESETS (backward compat)
+    3. Custom ``width``/``height``/``transparent`` flags — ad-hoc spec
+    4. Auto-detect from filename (POD types only)
 
     Args:
         input_path: Image file to validate.
-        product_type: Product type (auto-detected from filename if omitted).
+        product_type: POD product type (backward compat, auto-detected if omitted).
+        preset: Preset name from ALL_PRESETS (preferred over product_type).
+        width: Custom expected width (overrides preset).
+        height: Custom expected height (overrides preset).
+        transparent: Custom transparency requirement (overrides preset).
 
     Returns:
         Result with errors/warnings. success=True means design is acceptable.
     """
     input_path = Path(input_path)
+
+    # Validate preset name early (before opening image)
+    if preset and preset not in ALL_PRESETS:
+        return Result(errors=[
+            f"Unknown preset: '{preset}'. "
+            f"Available: {', '.join(ALL_PRESETS.keys())}"
+        ])
+
     if not input_path.exists():
         return Result(errors=[f"File not found: {input_path}"])
 
     img = Image.open(input_path).convert("RGBA")
     w, h = img.size
 
-    if product_type is None:
-        product_type = detect_product_type(input_path.name)
+    # Resolve spec: preset > product_type > custom > auto-detect
+    resolved_name = None
+    spec = None
+
+    if preset:
+        spec = ALL_PRESETS.get(preset)
+        resolved_name = preset
+    elif product_type:
+        spec = POD_PRESETS.get(product_type)
+        resolved_name = product_type
+    else:
+        detected = detect_product_type(input_path.name)
+        if detected:
+            spec = POD_PRESETS.get(detected)
+            resolved_name = detected
+
+    # Apply custom overrides
+    if width is not None or height is not None or transparent is not None:
+        if spec is None:
+            spec = {}
+        else:
+            spec = dict(spec)  # copy so we don't mutate the preset
+        if width is not None:
+            spec["width"] = width
+        if height is not None:
+            spec["height"] = height
+        if transparent is not None:
+            spec["transparent"] = transparent
+        if resolved_name is None:
+            resolved_name = "custom"
 
     result = Result(
         output_path=input_path,
         width=w,
         height=h,
     )
-    result.metadata["product_type"] = product_type or "unknown"
+    result.metadata["preset"] = resolved_name or "unknown"
+    # Backward compat: also set product_type in metadata
+    result.metadata["product_type"] = resolved_name or "unknown"
     result.metadata["dimensions"] = f"{w}x{h}"
 
     # Compute transparency stats
@@ -129,12 +226,11 @@ def validate_design(
     result.transparent_pct = trans_pct
     result.opaque_pct = 100.0 - trans_pct
 
-    spec = PRODUCT_SPECS.get(product_type) if product_type else None
     if spec is None:
-        if product_type is None:
+        if resolved_name is None:
             result.warnings.append(
-                "Could not detect product type from filename. "
-                "Specify product_type parameter."
+                "No preset or product type specified. "
+                "Use --preset or --type to validate against a spec."
             )
         return result
 

@@ -46,7 +46,7 @@ def test_help():
 def test_version():
     result = _run_cli("--version")
     assert result.returncode == 0
-    assert "0.1.0" in result.stdout
+    assert "0.2.0" in result.stdout
 
 
 def test_remove_bg_cli(sample_image, tmp_path):
