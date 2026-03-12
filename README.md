@@ -4,7 +4,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent--skills-compatible-purple.svg)](https://agentskills.io)
-[![Tests](https://img.shields.io/badge/tests-122%20passed-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-126%20passed-brightgreen.svg)](#testing)
 
 Image editing toolkit for AI agents. Photoshop for Claude Code, Codex, Cursor, and friends.
 
@@ -74,7 +74,7 @@ agentbrush text add input.png output.png --text "HELLO" --font mono-bold --size 
 agentbrush text render output.png --width 1664 --height 1664 --text "BUG\nFEATURE" --center
 
 # Compositing
-agentbrush composite overlay base.png art.png output.png --position 100,200
+agentbrush composite base.png art.png output.png --position 100,200
 agentbrush composite paste-centered output.png --overlay art.png --canvas 4500x5400 --fit
 
 # Resize
@@ -207,7 +207,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-All tests use synthetic Pillow-generated fixtures (no production images). 122 tests covering all modules.
+All tests use synthetic Pillow-generated fixtures (no production images). 126 tests covering all modules.
 
 ## Dependencies
 

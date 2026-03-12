@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.1 (2026-03-11)
+
+### CLI
+- Added `paste-centered` subcommand to `agentbrush composite` — center artwork on a new canvas with `--canvas WxH`, `--fit`, `--bg-color` options
+- Fixed README composite syntax: removed spurious `overlay` subcommand prefix
+
+### Tests
+- 126 tests (up from 122)
+
 ## 0.1.0 (2026-03-11)
 
 Initial release.

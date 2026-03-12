@@ -146,6 +146,58 @@ def test_composite_cli_resize(sample_image, tmp_path):
     assert out.exists()
 
 
+def test_composite_cli_paste_centered(tmp_path):
+    overlay = Image.new("RGBA", (40, 40), (0, 128, 255, 255))
+    overlay_path = tmp_path / "art.png"
+    overlay.save(overlay_path)
+
+    out = tmp_path / "centered_out.png"
+    result = _run_cli(
+        "composite", "paste-centered", str(out),
+        "--overlay", str(overlay_path),
+        "--canvas", "200x100",
+        "--fit",
+    )
+    assert result.returncode == 0
+    assert out.exists()
+    img = Image.open(out)
+    assert img.width == 200
+    assert img.height == 100
+
+
+def test_composite_cli_paste_centered_bg_color(tmp_path):
+    overlay = Image.new("RGBA", (20, 20), (255, 0, 0, 255))
+    overlay_path = tmp_path / "red.png"
+    overlay.save(overlay_path)
+
+    out = tmp_path / "bg_out.png"
+    result = _run_cli(
+        "composite", "paste-centered", str(out),
+        "--overlay", str(overlay_path),
+        "--canvas", "100x100",
+        "--bg-color", "0,0,0,255",
+    )
+    assert result.returncode == 0
+    assert out.exists()
+    img = Image.open(out)
+    # Corner should be black (bg color)
+    assert img.getpixel((0, 0)) == (0, 0, 0, 255)
+    # Center should be red (overlay)
+    assert img.getpixel((50, 50))[0] > 200
+
+
+def test_composite_cli_paste_centered_help():
+    result = _run_cli("composite", "paste-centered", "--help")
+    assert result.returncode == 0
+    assert "canvas" in result.stdout.lower()
+
+
+def test_composite_cli_help():
+    result = _run_cli("composite", "--help")
+    assert result.returncode == 0
+    assert "paste-centered" in result.stdout
+
+
 # --- Phase 2: Resize CLI ---
 
 def test_resize_cli_scale(sample_image, tmp_path):
