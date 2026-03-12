@@ -92,6 +92,68 @@ agentbrush generate --provider openai --prompt "cat coding" --output cat.png
 
 Exit codes: `0` = success, `1` = validation failure, `2` = input error.
 
+## Examples
+
+### Background Removal
+
+Edge-based flood fill removes the background while preserving internal dark details that threshold-based tools destroy.
+
+![Background removal: black bg to transparent](docs/images/compare_01_removebg.png)
+
+```bash
+agentbrush remove-bg input.png output.png --color black --threshold 25 --smooth
+```
+
+### Green Screen Removal
+
+Multi-pass pipeline: flood fill from edges, trapped patch sweep, upscale with halo cleanup.
+
+![Green screen removal](docs/images/compare_02_greenscreen.png)
+
+```bash
+agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
+```
+
+### Border Cleanup
+
+Iterative erosion removes white "sticker border" artifacts and green halos left by AI image generators.
+
+![Border artifact cleanup](docs/images/compare_03_border.png)
+
+```bash
+agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 20
+```
+
+### Text Rendering
+
+Accurate Pillow-based text rendering on new or existing canvases — no AI text mangling.
+
+![Text rendering on canvas](docs/images/compare_04_text.png)
+
+```bash
+agentbrush text new:1200x630 output.png "HELLO WORLD" --font mono --bold --size 72 --center
+```
+
+### Compositing
+
+Layer images with automatic centering, fit-to-canvas, and alpha blending.
+
+![Image compositing](docs/images/compare_05_composite.png)
+
+```bash
+agentbrush composite paste-centered output.png --overlay art.png --canvas 800x400 --fit
+```
+
+### Resize & Pad
+
+Resize to exact dimensions with letterbox padding to preserve aspect ratio.
+
+![Resize with padding](docs/images/compare_06_resize.png)
+
+```bash
+agentbrush resize input.png output.png --width 1200 --height 630 --fit --pad
+```
+
 ## Agent Skills
 
 AgentBrush ships as an [Agent Skills](https://agentskills.io) package. Copy `skill/agent-brush/` into your project's `.claude/skills/` directory:
@@ -203,9 +265,9 @@ removes ALL dark pixels       removes ONLY edge-connected dark pixels
 +-----------------+           +-----------------+
 ```
 
-## Examples
+## Guides
 
-Pipeline guides:
+Step-by-step pipeline walkthroughs:
 
 - [Social Media Images](docs/examples/social_media_images.md) — OG images, thumbnails, avatars
 - [Background Removal](docs/examples/background_removal.md) — black bg, white bg, green screen techniques
