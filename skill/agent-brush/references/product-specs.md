@@ -105,7 +105,7 @@
 1. Generate illustration (AI or manual)
 2. Remove background (`remove-bg` or `greenscreen`)
 3. Clean up borders (`border-cleanup`)
-4. Add text overlay if needed (`text add`)
+4. Add text overlay if needed (`agentbrush text input.png output.png "TEXT" [options]`)
 5. Ensure single shape (validated by `validate check --type sticker`)
 6. Resize to 1664x1664 if needed
 
