@@ -96,12 +96,12 @@ Exit codes: `0` = success, `1` = validation failure, `2` = input error.
 
 ### Background Removal
 
-Edge-based flood fill removes the background while preserving internal dark details that threshold-based tools destroy. Here a cyberpunk robot with glowing cyan circuitry keeps every neon edge and interior shadow intact:
+Edge-based flood fill removes the background while preserving artwork that threshold-based tools destroy. The colorful owl below keeps every feather edge, outline, and interior shadow intact — only the solid black background is removed:
 
-![Background removal: cyberpunk robot on black to transparent](docs/images/compare_01_removebg.png)
+![Background removal: colorful owl on black to transparent](docs/images/compare_01_removebg.png)
 
 ```bash
-agentbrush remove-bg robot.png cutout.png --color black --threshold 25 --smooth
+agentbrush remove-bg owl.png cutout.png --color black --threshold 25 --smooth
 ```
 
 ### Green Screen Removal
@@ -130,13 +130,13 @@ agentbrush text step3.png final.png "Dr. Agent Smith" --font mono --size 64 --ce
 
 ### Compositing
 
-Combine cutouts, backgrounds, and text into finished assets. The robot cutout from step 1 is placed on a gradient background with text overlay — a complete workflow in three commands:
+Combine cutouts, backgrounds, and text into finished assets. The owl cutout from step 1 is placed on a gradient background with text overlay — a complete workflow in three commands:
 
 ![Compositing: cutout + background + text = finished asset](docs/images/compare_04_composite.png)
 
 ```bash
-agentbrush composite gradient.png robot_cutout.png composed.png --position 30,15 --resize 600x600
-agentbrush text composed.png final.png "AgentBrush" --font mono --bold --size 64 --color "0,220,255,255"
+agentbrush composite gradient.png owl_cutout.png composed.png --position center --resize 500x500
+agentbrush text composed.png final.png "AgentBrush" --font mono --bold --size 48 --color "0,220,255,255"
 ```
 
 ### Resize & Validate
