@@ -70,8 +70,8 @@ agentbrush greenscreen input.png output.png --upscale 3 --halo-passes 20
 agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 20
 
 # Text rendering
-agentbrush text add input.png output.png --text "HELLO" --font mono-bold --size 72
-agentbrush text render output.png --width 1664 --height 1664 --text "BUG\nFEATURE" --center
+agentbrush text input.png output.png "HELLO" --font mono --bold --size 72
+agentbrush text new:1664x1664 output.png "BUG\nFEATURE" --bold --center
 
 # Compositing
 agentbrush composite base.png art.png output.png --position 100,200
@@ -123,7 +123,7 @@ python skill/agent-brush/scripts/validate.py check design.png --type sticker
 python skill/agent-brush/scripts/greenscreen.py input.png output.png --upscale 3
 ```
 
-Only requirement: `pip install Pillow` (if not already installed).
+Requirements: **Python >= 3.10** and **Pillow >= 12.1** (`pip install 'Pillow>=12.1'`). Older versions fail at runtime (`get_flattened_data` API requires Pillow 12.1+, type union syntax requires Python 3.10+).
 
 ## Modules
 

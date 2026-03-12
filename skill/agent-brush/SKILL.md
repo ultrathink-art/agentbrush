@@ -49,10 +49,10 @@ agentbrush border-cleanup input.png output.png --passes 15 --green-halo-passes 2
 
 ```bash
 # Add text to existing image
-agentbrush text add input.png output.png --text "HELLO WORLD" --font mono-bold --size 72 --color "255,255,255,255"
+agentbrush text input.png output.png "HELLO WORLD" --font mono --bold --size 72 --color "255,255,255,255"
 
-# Render text on new canvas
-agentbrush text render output.png --width 1664 --height 1664 --text "BUG\nFEATURE" --font mono-bold --size 120 --center
+# Render text on new canvas (use new:WxH as input)
+agentbrush text new:1664x1664 output.png "BUG\nFEATURE" --font mono --bold --size 120 --center
 ```
 
 ### Compositing

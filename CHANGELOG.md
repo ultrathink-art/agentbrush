@@ -6,6 +6,11 @@
 - Added `paste-centered` subcommand to `agentbrush composite` — center artwork on a new canvas with `--canvas WxH`, `--fit`, `--bg-color` options
 - Fixed README composite syntax: removed spurious `overlay` subcommand prefix
 
+### Docs
+- Fixed `text` CLI examples in SKILL.md and README — removed nonexistent `add`/`render` subcommands, correct syntax is `agentbrush text <input> <output> <text>` (use `new:WxH` as input for blank canvas)
+- Fixed `--font mono-bold` → `--font mono --bold` (CLI uses separate flag)
+- Fixed README standalone requirements: Python >= 3.10 + Pillow >= 12.1 (was "pip install Pillow")
+
 ### Tests
 - 126 tests (up from 122)
 
