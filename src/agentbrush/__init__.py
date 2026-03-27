@@ -1,6 +1,6 @@
 """AgentBrush — Image editing toolkit for AI agents."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from agentbrush.core.result import Result
 from agentbrush.background.ops import remove_background
@@ -11,6 +11,10 @@ from agentbrush.composite.ops import composite, paste_centered
 from agentbrush.resize.ops import resize_image
 from agentbrush.validate.ops import validate_design, compare_images
 from agentbrush.convert.ops import convert_image
+from agentbrush.crop.ops import smart_crop
+from agentbrush.palette.ops import extract_palette
+from agentbrush.diff.ops import diff_images
+from agentbrush.batch.ops import batch_process
 
 # generate is optional (requires openai package)
 try:
@@ -32,6 +36,10 @@ __all__ = [
     "validate_design",
     "compare_images",
     "convert_image",
+    "smart_crop",
+    "extract_palette",
+    "diff_images",
+    "batch_process",
 ]
 
 if _has_generate:

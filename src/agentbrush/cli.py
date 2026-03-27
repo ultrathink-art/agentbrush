@@ -13,6 +13,10 @@ Commands:
     validate         Validate image against presets or custom specs
     convert          Convert image format (PNG, JPEG, WEBP, etc.)
     generate         Generate image from text prompt (OpenAI/Pollinations)
+    crop             Auto-detect content bounds and crop to tight bounding box
+    palette          Extract dominant colors from an image
+    diff             Diff two images and highlight changes
+    batch            Process multiple images in a directory
 """
 from __future__ import annotations
 
@@ -44,6 +48,10 @@ def main(argv=None):
     from agentbrush.validate.cli import add_parser as add_validate
     from agentbrush.convert.cli import add_parser as add_convert
     from agentbrush.generate.cli import add_parser as add_generate
+    from agentbrush.crop.cli import add_parser as add_crop
+    from agentbrush.palette.cli import add_parser as add_palette
+    from agentbrush.diff.cli import add_parser as add_diff
+    from agentbrush.batch.cli import add_parser as add_batch
 
     add_bg(subparsers)
     add_gs(subparsers)
@@ -54,6 +62,10 @@ def main(argv=None):
     add_validate(subparsers)
     add_convert(subparsers)
     add_generate(subparsers)
+    add_crop(subparsers)
+    add_palette(subparsers)
+    add_diff(subparsers)
+    add_batch(subparsers)
 
     args = parser.parse_args(argv)
 

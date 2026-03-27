@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.3.0 (2026-03-27)
+
+### New Modules
+
+- **`batch`**: Process multiple images in a directory — validate, crop, resize, or remove backgrounds in bulk
+  - `agentbrush batch ./input/ ./output/ --operation crop --padding 10`
+  - `agentbrush batch ./input/ ./output/ --preset sticker`
+  - Supports: `validate`, `remove-bg`, `crop`, `resize`
+  - Per-file success/failure tracking in Result metadata
+- **`crop`**: Smart crop — auto-detect content bounds and crop to tight bounding box
+  - `agentbrush crop input.png output.png --padding 20`
+  - Uses alpha channel for transparent images, `--bg-color` for solid backgrounds
+  - Built on `core.geometry.find_artwork_bounds()`
+- **`palette`**: Color palette extraction — analyze image and output dominant colors
+  - `agentbrush palette input.png --format json --count 6`
+  - Formats: `json`, `hex`, `text`
+  - Uses Pillow median-cut quantization (no external deps)
+  - Ignores transparent pixels by default
+- **`diff`**: Image comparison — diff two images and highlight changes
+  - `agentbrush diff before.png after.png --output diff.png`
+  - Configurable threshold, highlight color, and dim factor
+  - Reports changed pixel count and percentage
+  - Handles different-sized images (extra area = changed)
+
+### CLI
+- 4 new subcommands: `crop`, `palette`, `diff`, `batch`
+- 13 total subcommands (up from 9)
+
+### Tests
+- 51 new tests across 4 modules + CLI integration
+- 185 tests total (up from 134)
+
 ## 0.2.0 (2026-03-12)
 
 ### Validate Module

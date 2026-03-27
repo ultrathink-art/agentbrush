@@ -46,7 +46,7 @@ def test_help():
 def test_version():
     result = _run_cli("--version")
     assert result.returncode == 0
-    assert "0.2.0" in result.stdout
+    assert "0.3.0" in result.stdout
 
 
 def test_remove_bg_cli(sample_image, tmp_path):
@@ -302,3 +302,137 @@ def test_generate_cli_help():
     result = _run_cli("generate", "--help")
     assert result.returncode == 0
     assert "prompt" in result.stdout.lower()
+
+
+# --- Phase 3: Crop CLI ---
+
+def test_crop_cli(sample_image, tmp_path):
+    out = tmp_path / "cropped.png"
+    result = _run_cli("crop", str(sample_image), str(out), "--padding", "5")
+    assert result.returncode == 0
+    assert out.exists()
+    assert "OK" in result.stdout
+
+
+def test_crop_cli_with_bg_color(sample_image, tmp_path):
+    out = tmp_path / "cropped.png"
+    result = _run_cli(
+        "crop", str(sample_image), str(out),
+        "--bg-color", "0,0,0",
+    )
+    assert result.returncode == 0
+    assert out.exists()
+
+
+def test_crop_cli_help():
+    result = _run_cli("crop", "--help")
+    assert result.returncode == 0
+    assert "padding" in result.stdout.lower()
+
+
+# --- Phase 3: Palette CLI ---
+
+def test_palette_cli_json(sample_image):
+    result = _run_cli("palette", str(sample_image), "--format", "json")
+    assert result.returncode == 0
+    assert '"colors"' in result.stdout
+
+
+def test_palette_cli_hex(sample_image):
+    result = _run_cli("palette", str(sample_image), "--format", "hex")
+    assert result.returncode == 0
+    assert "#" in result.stdout
+
+
+def test_palette_cli_text(sample_image):
+    result = _run_cli("palette", str(sample_image), "--format", "text")
+    assert result.returncode == 0
+    assert "rgb(" in result.stdout
+
+
+def test_palette_cli_count(sample_image):
+    result = _run_cli("palette", str(sample_image), "--count", "3")
+    assert result.returncode == 0
+
+
+def test_palette_cli_help():
+    result = _run_cli("palette", "--help")
+    assert result.returncode == 0
+    assert "count" in result.stdout.lower()
+
+
+# --- Phase 3: Diff CLI ---
+
+def test_diff_cli(sample_image, tmp_path):
+    # Create a modified version
+    img = Image.new("RGBA", (50, 50), (255, 255, 255, 255))
+    other = tmp_path / "other.png"
+    img.save(other)
+
+    out = tmp_path / "diff.png"
+    result = _run_cli(
+        "diff", str(sample_image), str(other),
+        "--output", str(out),
+    )
+    assert result.returncode == 0
+    assert out.exists()
+
+
+def test_diff_cli_threshold(sample_image, tmp_path):
+    other = tmp_path / "same.png"
+    Image.open(sample_image).save(other)
+
+    out = tmp_path / "diff.png"
+    result = _run_cli(
+        "diff", str(sample_image), str(other),
+        "--output", str(out), "--threshold", "5",
+    )
+    assert result.returncode == 0
+    assert "OK" in result.stdout
+
+
+def test_diff_cli_help():
+    result = _run_cli("diff", "--help")
+    assert result.returncode == 0
+    assert "threshold" in result.stdout.lower()
+
+
+# --- Phase 3: Batch CLI ---
+
+def test_batch_cli_validate(tmp_path):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+
+    img = Image.new("RGBA", (50, 50), (255, 0, 0, 255))
+    img.save(input_dir / "test.png")
+
+    result = _run_cli(
+        "batch", str(input_dir), str(output_dir),
+        "--operation", "validate", "--preset", "thumbnail",
+    )
+    assert result.returncode == 0
+    assert "1/1" in result.stdout
+
+
+def test_batch_cli_crop(tmp_path):
+    input_dir = tmp_path / "input"
+    output_dir = tmp_path / "output"
+    input_dir.mkdir()
+
+    img = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+    ImageDraw.Draw(img).rectangle([20, 20, 80, 80], fill=(0, 255, 0, 255))
+    img.save(input_dir / "test.png")
+
+    result = _run_cli(
+        "batch", str(input_dir), str(output_dir),
+        "--operation", "crop", "--padding", "5",
+    )
+    assert result.returncode == 0
+    assert "1/1" in result.stdout
+
+
+def test_batch_cli_help():
+    result = _run_cli("batch", "--help")
+    assert result.returncode == 0
+    assert "operation" in result.stdout.lower()

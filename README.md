@@ -4,7 +4,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/agent--skills-compatible-purple.svg)](https://agentskills.io)
-[![Tests](https://img.shields.io/badge/tests-134%20passed-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-185%20passed-brightgreen.svg)](#testing)
 
 Image editing toolkit for AI agents. Background removal, compositing, text rendering, resizing, format conversion, and spec validation.
 
@@ -25,7 +25,10 @@ pip install agentbrush[generate]
 ### Python API
 
 ```python
-from agentbrush import remove_background, resize_image, validate_design
+from agentbrush import (
+    remove_background, resize_image, validate_design,
+    smart_crop, extract_palette, diff_images, batch_process,
+)
 
 # Remove background (edge-based flood fill, safe for artwork)
 result = remove_background("photo.png", "cutout.png", color="white")
@@ -36,6 +39,20 @@ result = resize_image("cutout.png", "og_image.png", width=1200, height=630, pad=
 # Validate against a preset
 result = validate_design("og_image.png", preset="social-og")
 print(result.summary())
+
+# Smart crop to content bounds
+result = smart_crop("padded.png", "tight.png", padding=20)
+
+# Extract dominant colors
+result = extract_palette("photo.png", count=6)
+print(result.metadata["colors"])  # [{r, g, b, hex, pct}, ...]
+
+# Diff two images
+result = diff_images("before.png", "after.png", "diff.png")
+print(f"{result.metadata['changed_pct']}% changed")
+
+# Batch process a directory
+result = batch_process("./input/", "./output/", operation="crop", padding=10)
 ```
 
 Every function returns a `Result` object:
@@ -88,6 +105,25 @@ agentbrush convert input.png output.webp --quality 90
 
 # AI image generation (requires openai package)
 agentbrush generate --provider openai --prompt "cat coding" --output cat.png
+
+# Smart crop (auto-detect content, crop tight)
+agentbrush crop input.png output.png --padding 20
+agentbrush crop input.png output.png --bg-color 255,255,255
+
+# Color palette extraction
+agentbrush palette input.png --format json --count 6
+agentbrush palette input.png --format hex
+agentbrush palette input.png --format text
+
+# Image diff (before/after comparison)
+agentbrush diff before.png after.png --output diff.png
+agentbrush diff before.png after.png --output diff.png --threshold 20
+
+# Batch processing
+agentbrush batch ./input/ ./output/ --operation crop --padding 10
+agentbrush batch ./input/ ./output/ --operation validate --preset sticker
+agentbrush batch ./input/ ./output/ --operation resize --width 400 --height 400
+agentbrush batch ./input/ ./output/ --operation remove-bg --color white
 ```
 
 Exit codes: `0` = success, `1` = validation failure, `2` = input error.
@@ -189,6 +225,10 @@ Requirements: **Python >= 3.10** and **Pillow >= 12.1** (`pip install 'Pillow>=1
 | `validate` | Spec validation against presets | `validate_design()`, `compare_images()` |
 | `convert` | Format conversion (PNG/JPEG/WEBP) | `convert_image()` |
 | `generate` | AI image generation (optional) | `generate_image()` |
+| `crop` | Smart crop to content bounds | `smart_crop()` |
+| `palette` | Dominant color extraction | `extract_palette()` |
+| `diff` | Visual image comparison | `diff_images()` |
+| `batch` | Directory batch processing | `batch_process()` |
 
 ## Core Primitives
 

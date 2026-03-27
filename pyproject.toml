@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentbrush"
-version = "0.2.0"
+version = "0.3.0"
 description = "Image editing toolkit for AI agents. Background removal, compositing, text rendering, resizing, and validation."
 readme = "README.md"
 license = "MIT"
