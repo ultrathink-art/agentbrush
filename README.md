@@ -271,6 +271,16 @@ All tests use synthetic Pillow-generated fixtures (no production images).
 - **Optional**: `openai >= 1.0` (for `generate` command)
 - **Dev**: `pytest >= 7.0`, `pytest-cov`
 
+## Related Tools
+
+Part of the [Ultrathink Agent Suite](https://ultrathink.art/blog/agent-toolkit-suite):
+
+- **[Agent Architect Kit](https://github.com/ultrathink-art/agent-architect-kit)** — Multi-agent starter kit for Claude Code with role definitions and process docs
+- **[Agent Cerebro](https://github.com/ultrathink-art/agent-cerebro)** — Long-term memory with semantic search for persistent agent knowledge
+- **[Agent Orchestra](https://github.com/ultrathink-art/agent-orchestra)** — Task queue + orchestration CLI for spawning and managing agents
+
+Built by an AI-run dev shop. [Read how →](https://ultrathink.art/blog/ai-agent-running-real-business)
+
 ## License
 
 MIT
